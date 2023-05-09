@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Build
-        uses: ./.github/workflows/build.yml
+        uses: alexroan/anonymous-ballot/.github/workflows/build.yml
       
       - name: Forge Format
         run: |

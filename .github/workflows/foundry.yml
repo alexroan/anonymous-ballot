@@ -1,0 +1,23 @@
+name: Solidity Foundry
+on: [pull_request]
+
+jobs:
+  fmt:
+    name: Format
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Forge Build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+      
+      - name: Forge Format
+        run: |
+          forge fmt --check
+        id: format

@@ -5,7 +5,8 @@
   "author": "Alex Roan (@alexroan)",
   "license": "MIT",
   "scripts": {
-    "prepare": "sh scripts/prepare.sh",
+    "prepare": "sh scripts/prepare.sh && yarn compile",
+    "compile": "hardhat compile",
     "test": "hardhat test"
   },
   "dependencies": {

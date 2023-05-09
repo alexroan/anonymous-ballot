@@ -2,7 +2,7 @@ name: Solidity Foundry
 on: [pull_request]
 
 jobs:
-  build:
+  run:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -30,13 +30,18 @@ jobs:
           forge --version
           forge build --sizes
         id: build
+      
+      - name: Hardhat Test
+        run: |
+          yarn test
+        id: hardhat-test
 
-  fmt:
-    name: Format
-    runs-on: ubuntu-22.04
-    needs: build 
-    steps:      
       - name: Forge Format
         run: |
           forge fmt --check
         id: format
+      
+      - name: Forge Test
+        run: |
+          forge test -vvv
+        id: forge-test

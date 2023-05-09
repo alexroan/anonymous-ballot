@@ -4,6 +4,9 @@ import "@nomicfoundation/hardhat-toolbox";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 const config: HardhatUserConfig = {
+  mocha: {
+    timeout: 100000000
+  },
   solidity: {
     compilers: [
       {

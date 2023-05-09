@@ -8,4 +8,7 @@ remappings = [
     "zk-merkle-tree/=node_modules/zk-merkle-tree/",
 ]
 
+[fmt]
+ignore = ["contracts/generated/Verifier.sol"]
+
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

@@ -2,7 +2,30 @@ name: Solidity Foundry
 on: [pull_request]
 
 jobs:
-  run:
+  hardhat:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      
+      - name: Set Node.js 18.15
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.15
+      
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+      
+      - name: Hardhat Test
+        run: |
+          yarn test
+        id: hardhat-test
+
+  foundry:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -30,11 +53,6 @@ jobs:
           forge --version
           forge build --sizes
         id: build
-      
-      - name: Hardhat Test
-        run: |
-          yarn test
-        id: hardhat-test
 
       - name: Forge Format
         run: |

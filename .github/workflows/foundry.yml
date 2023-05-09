@@ -2,13 +2,14 @@ name: Solidity Foundry
 on: [pull_request]
 
 jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
   fmt:
     name: Format
     runs-on: ubuntu-22.04
-    steps:
-      - name: Build
-        uses: alexroan/anonymous-ballot/.github/workflows/build.yml
-      
+    needs: build 
+    steps:      
       - name: Forge Format
         run: |
           forge fmt --check

@@ -1,8 +1,9 @@
-name: Solidity Foundry
+name: Solidity
 on: [pull_request]
 
 jobs:
   hardhat:
+    name: Hardhat
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -26,6 +27,7 @@ jobs:
         id: hardhat-test
 
   foundry:
+    name: Foundry
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout

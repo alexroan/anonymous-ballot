@@ -1,10 +1,10 @@
 import { ethers } from "hardhat";
 import { mimcSpongecontract } from 'circomlibjs'
-import { AnonymousBallot } from "../typechain-types";
+import { AnonymousBallot, AddressList } from "../typechain-types";
 import { generateCommitment, calculateMerkleRootAndZKProof } from 'zk-merkle-tree';
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { assert } from "chai";
-
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 const SEED = "mimcsponge";
 // the default verifier is for 20 levels, for different number of levels, you need a new verifier circuit
@@ -17,6 +17,7 @@ describe("AnonymousBallot", () =>  {
     let signers: SignerWithAddress[]
     let voters: SignerWithAddress[]
     let ballot: AnonymousBallot
+    let allowlist: AddressList
 
     // Register a voter and return the random commitment
     async function register(signer: SignerWithAddress) {
@@ -40,8 +41,10 @@ describe("AnonymousBallot", () =>  {
         const Verifier = await ethers.getContractFactory("Verifier");
         const verifier = await Verifier.deploy();
         voters = signers.slice(0, 5)
+        const AddressList = await ethers.getContractFactory("AddressList");
+        allowlist = await AddressList.deploy(voters.map(v => v.address));
         const AnonymousBallot = await ethers.getContractFactory("AnonymousBallot");
-        ballot = await AnonymousBallot.deploy(voters.map(v => v.address), TREE_LEVELS, mimcsponge.address, verifier.address);
+        ballot = await AnonymousBallot.deploy(TREE_LEVELS, mimcsponge.address, verifier.address, allowlist.address, 10);
     });
 
     it("Test voting one way", async () => {
@@ -52,12 +55,14 @@ describe("AnonymousBallot", () =>  {
             commitments.push(await register(voters[i]))
         }
 
+        await time.increase(10);
+
         // votes
         for (let i = 0; i < voters.length; i++) {
             await vote(signers[i+5], OPTION_A, commitments[i])
         }
 
-        assert((await ballot.voteTally(OPTION_A)).toString() == voters.length.toString(), "OPTION_A tally not correct")
-        assert((await ballot.voteTally(OPTION_B)).toString() == "0", "OPTION_B tally not correct")
+        assert((await ballot.s_voteTally(OPTION_A)).toString() == voters.length.toString(), "OPTION_A tally not correct")
+        assert((await ballot.s_voteTally(OPTION_B)).toString() == "0", "OPTION_B tally not correct")
     });
 });

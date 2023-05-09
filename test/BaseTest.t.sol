@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 import {Test} from "forge-std/Test.sol";
 
 contract BaseTest is Test {
-
     address internal constant USER_0 = address(0x01);
     address internal constant USER_1 = address(0x02);
     address internal constant USER_2 = address(0x03);

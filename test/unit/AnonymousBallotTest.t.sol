@@ -7,7 +7,6 @@ import {IAllowList} from "../../contracts/allowlists/IAllowList.sol";
 import {IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 
 contract AnonymousBallotTest is BaseTest {
-
     AnonymousBallot internal s_ballot;
 
     IHasher internal s_mockHasher;
@@ -31,18 +30,14 @@ contract AnonymousBallotTest is BaseTest {
 contract AnonymousBallotTest_registerCommitment is AnonymousBallotTest {
     function test_nonEligibleSender() public {
         vm.mockCall(
-            address(s_mockAllowList),
-            abi.encodeWithSelector(
-                IAllowList.isAllowed.selector,
-                USER_0
-            ),
-            abi.encode(false)
+            address(s_mockAllowList), abi.encodeWithSelector(IAllowList.isAllowed.selector, USER_0), abi.encode(false)
         );
 
         vm.expectRevert(abi.encodeWithSelector(IBallot.NotEligible.selector, USER_0));
         s_ballot.registerCommitment(12345);
     }
     // TODO
+
     function test_senderAlreadyCommitted() public {}
     // TODO
     function test_invalidCommitment() public {}
@@ -53,5 +48,5 @@ contract AnonymousBallotTest_registerCommitment is AnonymousBallotTest {
 }
 
 contract AnonymousBallotTest_vote is AnonymousBallotTest {
-    // TODO
+// TODO
 }

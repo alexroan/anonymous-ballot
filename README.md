@@ -2,7 +2,7 @@
 
 ## Tl;dr
 
-The list of voters _is_ public, but the direction in which they vote is private.
+The list of voters is public, but the direction in which they vote is private.
 
 ## Example
 

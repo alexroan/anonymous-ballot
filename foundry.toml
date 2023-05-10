@@ -6,6 +6,7 @@ remappings = [
     "eth-gas-reporter/=node_modules/eth-gas-reporter/",
     "hardhat/=node_modules/hardhat/",
     "zk-merkle-tree/=node_modules/zk-merkle-tree/",
+    "@openzeppelin/=node_modules/@openzeppelin/",
 ]
 
 [fmt]

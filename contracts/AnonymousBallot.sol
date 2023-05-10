@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.18;
 
-import {ZKTree, IHasher, IVerifier} from "../node_modules/zk-merkle-tree/contracts/ZKTree.sol";
+import {ZKTree, IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 import {IAllowList} from "./allowlists/IAllowList.sol";
 import {IBallot} from "./IBallot.sol";
 

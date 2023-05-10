@@ -11,22 +11,58 @@ import {
     TimelockController,
     GovernorTimelockControl
 } from "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import {ZKTree, IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 
 contract GovernorZK is
     Governor,
     GovernorCompatibilityBravo,
     GovernorVotes,
     GovernorVotesQuorumFraction,
-    GovernorTimelockControl
+    GovernorTimelockControl,
+    ZKTree
 {
-    constructor(IVotes _token, TimelockController _timelock)
+    error WrongState(ProposalState actual, ProposalState expected);
+    error AlreadyCommitted(uint256 proposalId, address voter);
+    error NotEligible(address voter);
+    error InvalidCommitment(uint256 commitment);
+
+    mapping(uint256 proposalId => mapping(address voter => bool commited)) public s_hasCommitted;
+
+    constructor(
+        IVotes _token,
+        TimelockController _timelock,
+        uint32 zkTreeLevels,
+        IHasher zkHasher,
+        IVerifier zkVerifier
+    )
         Governor("GovernorZK")
         GovernorVotes(_token)
         GovernorVotesQuorumFraction(50)
         GovernorTimelockControl(_timelock)
+        ZKTree(zkTreeLevels, zkHasher, zkVerifier)
     {}
 
-    // TODO Commit function
+    /// @dev Commit function
+    /// should be called by the voter during the Pending phase,
+    /// should reach out to _getVotes to get the voter's voting power,
+    /// should store commitment in the merkle tree
+    function registerCommitment(uint256 proposalId, uint256 commitment) external {
+        // check the state is pending
+        ProposalState proposalState = state(proposalId);
+        if (proposalState != ProposalState.Pending) revert WrongState(proposalState, ProposalState.Pending);
+        // check if the msg.sender has already committed for this vote
+        if (s_hasCommitted[proposalId][msg.sender]) revert AlreadyCommitted(proposalId, msg.sender);
+        // check that the msg.sender is eligible to commit for this vote
+        uint256 weight = getVotes(msg.sender, proposalSnapshot(proposalId));
+        if (weight == 0) revert NotEligible(msg.sender);
+        // check that the commitment is valid
+        if (commitment == 0) revert InvalidCommitment(commitment);
+
+        // commit
+        _commit(bytes32(commitment));
+        s_hasCommitted[proposalId][msg.sender] = true;
+    }
+
     // TODO Override and revert existing castVote functions
     // TODO Implement new castVote functions with ZK proofs
 

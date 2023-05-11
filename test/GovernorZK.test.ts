@@ -4,14 +4,15 @@ import { GovernorZK, GovernorZKVotes, TimelockController } from "../typechain-ty
 import { generateCommitment, calculateMerkleRootAndZKProof } from 'zk-merkle-tree';
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { assert } from "chai";
-import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { mine } from "@nomicfoundation/hardhat-network-helpers";
 
 const SEED = "mimcsponge";
 // the default verifier is for 20 levels, for different number of levels, you need a new verifier circuit
 const TREE_LEVELS = 20;
 
-const OPTION_A = 99;
-const OPTION_B = 98;
+const AGAINST = 0;
+const FOR = 1;
+const ABSTAIN = 2;
 
 describe("GovernorZK", () =>  {
     let signers: SignerWithAddress[]
@@ -32,7 +33,7 @@ describe("GovernorZK", () =>  {
     // Impossible to link the vote to the signer of the original commitment
     async function vote(randomSigner: SignerWithAddress, proposalId: number, support: number, commitment: any) {
         const cd = await calculateMerkleRootAndZKProof(governor.address, randomSigner, TREE_LEVELS, commitment, "keys/Verifier.zkey")
-        await governor.connect(randomSigner).castVote(proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
+        await governor.connect(randomSigner)['castVote(uint256,uint8,uint256,uint256,uint256[2],uint256[2][2],uint256[2])'](proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
     }
 
     before(async () => {
@@ -50,23 +51,29 @@ describe("GovernorZK", () =>  {
         governor = await GovernorZK.deploy(governorVotes.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
     });
 
-    it("Test voting one way", async () => {
-        
-        // let commitments = []
+    it("Test voting one way", async () => {        
+        const tx = await governor['propose(address[],uint256[],bytes[],string)']([voters[0].address], [100], [0x00], "Test")
+        const receipt = await tx.wait()
+        const proposalId = receipt.events[0].args.proposalId.toString();
 
-        // // register voters
-        // for (let i = 0; i < voters.length; i++) {
-        //     commitments.push(await register(voters[i]))
-        // }
+        console.log(await governor.state(proposalId))
+        let commitments = []
 
-        // await time.increase(10);
+        // register voters
+        for (let i = 0; i < voters.length; i++) {
+            commitments.push(await register(proposalId, voters[i]))
+        }
 
-        // // votes
-        // for (let i = 0; i < voters.length; i++) {
-        //     await vote(signers[i+5], OPTION_A, commitments[i])
-        // }
+        await mine(46027)
 
-        // assert((await governor.s_voteTally(OPTION_A)).toString() == voters.length.toString(), "OPTION_A tally not correct")
-        // assert((await governor.s_voteTally(OPTION_B)).toString() == "0", "OPTION_B tally not correct")
+        // votes
+        for (let i = 0; i < voters.length; i++) {
+            await vote(signers[i+5], proposalId, FOR, commitments[i])
+        }
+
+        await mine(46027)
+
+        // Assert that it succeeds
+        assert(await governor.state(proposalId) == 4)
     });
 });

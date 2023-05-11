@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "hardhat-contract-sizer";
 // require("hardhat-circom");
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -14,6 +15,10 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.18",
+        settings: {
+          viaIR: true,
+          optimizer: { enabled: true },
+        }
       },
     ],
   },

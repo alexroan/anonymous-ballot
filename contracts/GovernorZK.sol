@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IGovernor, Governor, IERC165} from "@openzeppelin/contracts/governance/Governor.sol";
-import {GovernorCompatibilityZK} from "./compatibility/GovernorCompatibilityZK.sol";
+import {GovernorCompatibilityZK} from "./GovernorCompatibilityZK.sol";
 import {IVotes, GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
 import {GovernorVotesQuorumFraction} from
     "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";

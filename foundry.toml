@@ -9,6 +9,8 @@ remappings = [
     "@openzeppelin/=node_modules/@openzeppelin/",
 ]
 
+via_ir = true
+
 [fmt]
 ignore = ["contracts/generated/Verifier.sol"]
 

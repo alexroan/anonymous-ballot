@@ -69,7 +69,7 @@ contract GovernorZK is
         revert NotImplemented();
     }
 
-    // TODO Implement new castVote functions with ZK proofs
+    /// @dev castVote with ZK proofs
     function castVote(
         uint256 proposalId,
         uint8 support,
@@ -101,7 +101,7 @@ contract GovernorZK is
     /// BLOILERPLATE BELOW ///
 
     function votingDelay() public pure override returns (uint256) {
-        return 6575; // 1 day
+        return 46027; // 1 week
     }
 
     function votingPeriod() public pure override returns (uint256) {

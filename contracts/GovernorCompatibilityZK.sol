@@ -241,6 +241,8 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
         return details.forVotes > details.againstVotes;
     }
 
+    /// @dev This does not actually check if the nuffilier has already voted because the merkle
+    /// tree should be handling that prior to this function being called.
     function _countVote(uint256 proposalId, bytes32 nullifier, uint8 support, uint256 weight)
         internal
         virtual

@@ -24,7 +24,9 @@ describe("GovernorZK", () =>  {
     // Register a voter and return the random commitment
     async function register(proposalId: number, signer: SignerWithAddress) {
         const commitment = await generateCommitment()
-        await governor.connect(signer).registerCommitment(proposalId, commitment.commitment)
+        const tx = await governor.connect(signer).registerCommitment(proposalId, commitment.commitment)
+        const receipt = await tx.wait()
+        console.log("registerCommitment gasUsed", receipt.gasUsed.toString())
         return commitment;
     }
 
@@ -33,7 +35,9 @@ describe("GovernorZK", () =>  {
     // Impossible to link the vote to the signer of the original commitment
     async function vote(randomSigner: SignerWithAddress, proposalId: number, support: number, commitment: any) {
         const cd = await calculateMerkleRootAndZKProof(governor.address, randomSigner, TREE_LEVELS, commitment, "keys/Verifier.zkey")
-        await governor.connect(randomSigner)['castVote(uint256,uint8,uint256,uint256,uint256[2],uint256[2][2],uint256[2])'](proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
+        const tx = await governor.connect(randomSigner)['castVote(uint256,uint8,uint256,uint256,uint256[2],uint256[2][2],uint256[2])'](proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
+        const receipt = await tx.wait()
+        console.log("castVote gasUsed", receipt.gasUsed.toString())
     }
 
     before(async () => {

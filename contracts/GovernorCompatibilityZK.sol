@@ -219,7 +219,7 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
     /**
      * @dev See {IGovernor-hasVoted}.
      */
-    function hasVoted(uint256 proposalId, address account) public view virtual override returns (bool) {
+    function hasVoted(uint256, address) public view virtual override returns (bool) {
         // return _proposalDetails[proposalId].receipts[account].hasVoted;
         // TODO: Figure better way of doing this.
         revert();

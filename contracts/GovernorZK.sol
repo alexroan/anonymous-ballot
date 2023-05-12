@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import {IGovernor, Governor, IERC165} from "@openzeppelin/contracts/governance/Governor.sol";
 import {GovernorCompatibilityZK} from "./GovernorCompatibilityZK.sol";
+import {IGovernorZK} from "./IGovernorZK.sol";
 import {IVotes, GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
 import {GovernorVotesQuorumFraction} from
     "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
@@ -13,6 +14,7 @@ import {
 import {ZKTree, IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 
 contract GovernorZK is
+    IGovernorZK,
     Governor,
     GovernorVotes,
     GovernorVotesQuorumFraction,
@@ -20,11 +22,6 @@ contract GovernorZK is
     GovernorCompatibilityZK,
     ZKTree
 {
-    error WrongState(ProposalState actual, ProposalState expected);
-    error AlreadyCommitted(uint256 proposalId, address voter);
-    error NotEligible(address voter);
-    error InvalidCommitment(uint256 commitment);
-    error NotImplemented();
 
     mapping(uint256 proposalId => mapping(address voter => bool commited)) public s_hasCommitted;
 
@@ -46,7 +43,7 @@ contract GovernorZK is
     /// should be called by the voter during the Pending phase,
     /// should reach out to _getVotes to get the voter's voting power,
     /// should store commitment in the merkle tree
-    function registerCommitment(uint256 proposalId, uint256 commitment) external {
+    function registerCommitment(uint256 proposalId, uint256 commitment) external override(IGovernorZK) {
         // check the state is pending
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Pending) revert WrongState(proposalState, ProposalState.Pending);
@@ -78,7 +75,7 @@ contract GovernorZK is
         uint256[2] calldata proof_a,
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
-    ) external {
+    ) external override(IGovernorZK){
         // Check that the state is active
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Active) revert WrongState(proposalState, ProposalState.Active);

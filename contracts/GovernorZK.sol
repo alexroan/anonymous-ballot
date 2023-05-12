@@ -22,7 +22,6 @@ contract GovernorZK is
     GovernorCompatibilityZK,
     ZKTree
 {
-
     mapping(uint256 proposalId => mapping(address voter => bool commited)) public s_hasCommitted;
 
     constructor(
@@ -75,7 +74,7 @@ contract GovernorZK is
         uint256[2] calldata proof_a,
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
-    ) external override(IGovernorZK){
+    ) external override(IGovernorZK) {
         // Check that the state is active
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Active) revert WrongState(proposalState, ProposalState.Active);
@@ -87,8 +86,9 @@ contract GovernorZK is
             proposalId,
             bytes32(nullifier),
             support,
-            1 // hard coded for now... Perhaps have the circuit prove that the weight is correct?
-                // TODO Pass it in as a param when casting a vote? Something to think about later
+            1 // We assume that if your commitment is part of the merkle tree, then your voting power is 1.
+                // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
+                // TODO: Think more about this in future versions.
         );
 
         // TODO event

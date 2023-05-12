@@ -51,12 +51,11 @@ describe("GovernorZK", () =>  {
         governor = await GovernorZK.deploy(governorVotes.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
     });
 
-    it("Test voting one way", async () => {        
+    it("Test 5 participants voting FOR a proposal", async () => {        
         const tx = await governor['propose(address[],uint256[],bytes[],string)']([voters[0].address], [100], [0x00], "Test")
         const receipt = await tx.wait()
         const proposalId = receipt.events[0].args.proposalId.toString();
 
-        console.log(await governor.state(proposalId))
         let commitments = []
 
         // register voters

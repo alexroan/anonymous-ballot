@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { mimcSpongecontract } from 'circomlibjs'
-import { GovernorZK, GovernorZKVotes, TimelockController } from "../typechain-types";
+import { GovernorZK, ZKTokenVoting, TimelockController } from "../typechain-types";
 import { generateCommitment, calculateMerkleRootAndZKProof } from 'zk-merkle-tree';
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { assert } from "chai";
@@ -18,7 +18,7 @@ describe("GovernorZK", () =>  {
     let signers: SignerWithAddress[]
     let voters: SignerWithAddress[]
     let governor: GovernorZK
-    let governorVotes: GovernorZKVotes
+    let zkTokenVoting: ZKTokenVoting
     let timelockController: TimelockController
 
     // Register a voter and return the random commitment
@@ -47,12 +47,12 @@ describe("GovernorZK", () =>  {
         const Verifier = await ethers.getContractFactory("Verifier");
         const verifier = await Verifier.deploy();
         voters = signers.slice(0, 5)
-        const GovernorZKVotes = await ethers.getContractFactory("GovernorZKVotes");
-        governorVotes = await GovernorZKVotes.deploy(voters.map(v => v.address));
+        const ZKTokenVoting = await ethers.getContractFactory("ZKTokenVoting");
+        zkTokenVoting = await ZKTokenVoting.deploy(voters.map(v => v.address));
         const TimelockController = await ethers.getContractFactory("TimelockController");
         timelockController = await TimelockController.deploy(0, [voters[0].address], [voters[0].address], voters[0].address)
         const GovernorZK = await ethers.getContractFactory("GovernorZK");
-        governor = await GovernorZK.deploy(governorVotes.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
+        governor = await GovernorZK.deploy(zkTokenVoting.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
     });
 
     it("Test 5 participants voting FOR a proposal", async () => {        

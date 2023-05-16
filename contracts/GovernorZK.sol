@@ -5,6 +5,7 @@ import {IGovernor, Governor, IERC165} from "@openzeppelin/contracts/governance/G
 import {GovernorCompatibilityZK} from "./GovernorCompatibilityZK.sol";
 import {IGovernorZK} from "./IGovernorZK.sol";
 import {IVotes, GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import {IVotesPerVoter} from "./IVotesPerVoter.sol";
 import {GovernorVotesQuorumFraction} from
     "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import {
@@ -86,9 +87,10 @@ contract GovernorZK is
             proposalId,
             bytes32(nullifier),
             support,
-            1 // We assume that if your commitment is part of the merkle tree, then your voting power is 1.
-                // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
-                // TODO: Think more about this in future versions.
+            // Currently this returns 1, as we assume that if your commitment is part of the merkle tree, then your voting power is 1.
+            // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
+            // TODO: Think more about this in future versions.
+            IVotesPerVoter(address(token)).votesPerVoter()
         );
 
         // TODO event

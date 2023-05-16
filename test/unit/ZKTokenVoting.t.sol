@@ -2,10 +2,10 @@
 pragma solidity ^0.8.18;
 
 import {BaseTest} from "../BaseTest.t.sol";
-import {GovernorZKVotes} from "../../contracts/GovernorZKVotes.sol";
+import {ZKTokenVoting} from "../../contracts/ZKTokenVoting.sol";
 
-contract GovernorZKVotesTest is BaseTest {
-    GovernorZKVotes internal s_votes;
+contract ZKTokenVotingTest is BaseTest {
+    ZKTokenVoting internal s_votes;
 
     function setUp() public virtual override {
         BaseTest.setUp();
@@ -15,7 +15,11 @@ contract GovernorZKVotesTest is BaseTest {
         addresses[2] = USER_2;
         addresses[3] = USER_3;
         addresses[4] = USER_4;
-        s_votes = new GovernorZKVotes(addresses);
+        s_votes = new ZKTokenVoting(addresses);
+    }
+
+    function testVotesPerVoter() public {
+        assertEq(s_votes.votesPerVoter(), 1);
     }
 
     function testGetVotes() public {

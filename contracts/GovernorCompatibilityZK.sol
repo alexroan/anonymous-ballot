@@ -219,7 +219,7 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
     /**
      * @dev See {IGovernor-hasVoted}.
      */
-    function hasVoted(uint256 proposalId, address account) public view virtual override returns (bool) {
+    function hasVoted(uint256, address) public view virtual override returns (bool) {
         // return _proposalDetails[proposalId].receipts[account].hasVoted;
         // TODO: Figure better way of doing this.
         revert();
@@ -241,6 +241,8 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
         return details.forVotes > details.againstVotes;
     }
 
+    /// @dev This does not actually check if the nuffilier has already voted because the merkle
+    /// tree should be handling that prior to this function being called.
     function _countVote(uint256 proposalId, bytes32 nullifier, uint8 support, uint256 weight)
         internal
         virtual

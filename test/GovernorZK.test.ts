@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { mimcSpongecontract } from 'circomlibjs'
-import { GovernorZK, GovernorZKVotes, TimelockController } from "../typechain-types";
+import { GovernorZK, ZKTokenVoting, TimelockController } from "../typechain-types";
 import { generateCommitment, calculateMerkleRootAndZKProof } from 'zk-merkle-tree';
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { assert } from "chai";
@@ -18,13 +18,15 @@ describe("GovernorZK", () =>  {
     let signers: SignerWithAddress[]
     let voters: SignerWithAddress[]
     let governor: GovernorZK
-    let governorVotes: GovernorZKVotes
+    let zkTokenVoting: ZKTokenVoting
     let timelockController: TimelockController
 
     // Register a voter and return the random commitment
     async function register(proposalId: number, signer: SignerWithAddress) {
         const commitment = await generateCommitment()
-        await governor.connect(signer).registerCommitment(proposalId, commitment.commitment)
+        const tx = await governor.connect(signer).registerCommitment(proposalId, commitment.commitment)
+        const receipt = await tx.wait()
+        console.log("registerCommitment gasUsed", receipt.gasUsed.toString())
         return commitment;
     }
 
@@ -33,7 +35,9 @@ describe("GovernorZK", () =>  {
     // Impossible to link the vote to the signer of the original commitment
     async function vote(randomSigner: SignerWithAddress, proposalId: number, support: number, commitment: any) {
         const cd = await calculateMerkleRootAndZKProof(governor.address, randomSigner, TREE_LEVELS, commitment, "keys/Verifier.zkey")
-        await governor.connect(randomSigner)['castVote(uint256,uint8,uint256,uint256,uint256[2],uint256[2][2],uint256[2])'](proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
+        const tx = await governor.connect(randomSigner)['castVote(uint256,uint8,uint256,uint256,uint256[2],uint256[2][2],uint256[2])'](proposalId, support, cd.nullifierHash, cd.root, cd.proof_a, cd.proof_b, cd.proof_c)
+        const receipt = await tx.wait()
+        console.log("castVote gasUsed", receipt.gasUsed.toString())
     }
 
     before(async () => {
@@ -43,20 +47,19 @@ describe("GovernorZK", () =>  {
         const Verifier = await ethers.getContractFactory("Verifier");
         const verifier = await Verifier.deploy();
         voters = signers.slice(0, 5)
-        const GovernorZKVotes = await ethers.getContractFactory("GovernorZKVotes");
-        governorVotes = await GovernorZKVotes.deploy(voters.map(v => v.address));
+        const ZKTokenVoting = await ethers.getContractFactory("ZKTokenVoting");
+        zkTokenVoting = await ZKTokenVoting.deploy(voters.map(v => v.address));
         const TimelockController = await ethers.getContractFactory("TimelockController");
         timelockController = await TimelockController.deploy(0, [voters[0].address], [voters[0].address], voters[0].address)
         const GovernorZK = await ethers.getContractFactory("GovernorZK");
-        governor = await GovernorZK.deploy(governorVotes.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
+        governor = await GovernorZK.deploy(zkTokenVoting.address, timelockController.address, TREE_LEVELS, mimcsponge.address, verifier.address);
     });
 
-    it("Test voting one way", async () => {        
+    it("Test 5 participants voting FOR a proposal", async () => {        
         const tx = await governor['propose(address[],uint256[],bytes[],string)']([voters[0].address], [100], [0x00], "Test")
         const receipt = await tx.wait()
         const proposalId = receipt.events[0].args.proposalId.toString();
 
-        console.log(await governor.state(proposalId))
         let commitments = []
 
         // register voters

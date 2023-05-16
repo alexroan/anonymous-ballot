@@ -16,7 +16,10 @@ The link between Patrick's allow-listed address and the vote he casts is severed
 ## Current limitations
 
 - 1 token = 1 vote doesn't work here as it risks giving away the identity of the voter. GovernorZK currently supports 1 allow-listed account = 1 vote, however, it is outsourced using the `IVotes` interface as defined by Openzeppelin. Some ideas on this:
-  - Soulbound voting works well here, as well as rules like "Any balance above 0 = 1 vote" (NFTs for example)/
+  - Soulbound voting works well here, as well as rules like "Any balance above 0 = 1 vote" (NFTs for example).
   - This could be expanded by supporting tranches of votes (1, 10, 100, 1000, etc), similar to Tornado cash
 - The Merkle Tree size is fixed to a height of 20 (2^20 leaves). Could we make this flexible depending on the use case?
 - Foundry support is lacking given that most ZK libraries are written in JS/TS. Wen Ripped Jesus?
+- Gas heavy: We'll target L2s initially, but efforts to reduce gas costs include:
+  - Rolling Openzeppelin contracts into the main GovernorZK contract to pack reused storage.
+  - Contribute/Rewrite [zk-merkle-tree](https://github.com/TheBojda/zk-merkle-tree) to optimize as much as possible (this could be a spinoff project).

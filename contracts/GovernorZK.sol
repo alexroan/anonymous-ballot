@@ -3,7 +3,9 @@ pragma solidity ^0.8.18;
 
 import {IGovernor, Governor, IERC165} from "@openzeppelin/contracts/governance/Governor.sol";
 import {GovernorCompatibilityZK} from "./GovernorCompatibilityZK.sol";
+import {IGovernorZK} from "./IGovernorZK.sol";
 import {IVotes, GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import {IVotesPerVoter} from "./IVotesPerVoter.sol";
 import {GovernorVotesQuorumFraction} from
     "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import {
@@ -13,6 +15,7 @@ import {
 import {ZKTree, IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 
 contract GovernorZK is
+    IGovernorZK,
     Governor,
     GovernorVotes,
     GovernorVotesQuorumFraction,
@@ -20,12 +23,6 @@ contract GovernorZK is
     GovernorCompatibilityZK,
     ZKTree
 {
-    error WrongState(ProposalState actual, ProposalState expected);
-    error AlreadyCommitted(uint256 proposalId, address voter);
-    error NotEligible(address voter);
-    error InvalidCommitment(uint256 commitment);
-    error NotImplemented();
-
     mapping(uint256 proposalId => mapping(address voter => bool commited)) public s_hasCommitted;
 
     constructor(
@@ -46,7 +43,7 @@ contract GovernorZK is
     /// should be called by the voter during the Pending phase,
     /// should reach out to _getVotes to get the voter's voting power,
     /// should store commitment in the merkle tree
-    function registerCommitment(uint256 proposalId, uint256 commitment) external {
+    function registerCommitment(uint256 proposalId, uint256 commitment) external override(IGovernorZK) {
         // check the state is pending
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Pending) revert WrongState(proposalState, ProposalState.Pending);
@@ -78,7 +75,7 @@ contract GovernorZK is
         uint256[2] calldata proof_a,
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
-    ) external {
+    ) external override(IGovernorZK) {
         // Check that the state is active
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Active) revert WrongState(proposalState, ProposalState.Active);
@@ -90,8 +87,10 @@ contract GovernorZK is
             proposalId,
             bytes32(nullifier),
             support,
-            1 // hard coded for now... Perhaps have the circuit prove that the weight is correct?
-                // TODO Pass it in as a param when casting a vote? Something to think about later
+            // Currently this returns 1, as we assume that if your commitment is part of the merkle tree, then your voting power is 1.
+            // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
+            // TODO: Think more about this in future versions.
+            IVotesPerVoter(address(token)).votesPerVoter()
         );
 
         // TODO event

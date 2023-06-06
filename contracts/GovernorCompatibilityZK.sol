@@ -4,8 +4,8 @@
 pragma solidity ^0.8.18;
 
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {IGovernorTimelock} from "@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol";
-import {IGovernor, Governor} from "@openzeppelin/contracts/governance/Governor.sol";
+import {IGovernorTimelock} from "./IGovernorTimelock.sol";
+import {IGovernor, Governor} from "./Governor.sol";
 import {IGovernorCompatibilityZK} from "./IGovernorCompatibilityZK.sol";
 
 /**

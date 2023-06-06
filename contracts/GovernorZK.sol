@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {IGovernor, Governor, IERC165} from "@openzeppelin/contracts/governance/Governor.sol";
+import {IGovernor, Governor, IERC165} from "./Governor.sol";
 import {GovernorCompatibilityZK} from "./GovernorCompatibilityZK.sol";
 import {IGovernorZK} from "./IGovernorZK.sol";
-import {IVotes, GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import {IVotes, GovernorVotes} from "./GovernorVotes.sol";
 import {IVotesPerVoter} from "./IVotesPerVoter.sol";
-import {GovernorVotesQuorumFraction} from
-    "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
-import {
-    TimelockController,
-    GovernorTimelockControl
-} from "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import {GovernorVotesQuorumFraction} from "./GovernorVotesQuorumFraction.sol";
+import {TimelockController, GovernorTimelockControl} from "./GovernorTimelockControl.sol";
 import {ZKTree, IHasher, IVerifier} from "zk-merkle-tree/contracts/ZKTree.sol";
 
 contract GovernorZK is
@@ -58,12 +54,6 @@ contract GovernorZK is
         // commit
         _commit(bytes32(commitment));
         s_hasCommitted[proposalId][msg.sender] = true;
-    }
-
-    /// @dev this overrides _castVote. All castVote functions in inherited contracts
-    /// that call it therefore revert. We use our own caseVote function that uses ZK proofs.
-    function _castVote(uint256, address, uint8, string memory, bytes memory) internal pure override returns (uint256) {
-        revert NotImplemented();
     }
 
     /// @dev castVote with ZK proofs

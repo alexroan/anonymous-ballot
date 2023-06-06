@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {IGovernor} from "@openzeppelin/contracts/governance/IGovernor.sol";
+import {IGovernor} from "./IGovernor.sol";
 
 interface IGovernorZK {
     error WrongState(IGovernor.ProposalState actual, IGovernor.ProposalState expected);

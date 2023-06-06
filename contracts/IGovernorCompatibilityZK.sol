@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import {IGovernor} from "@openzeppelin/contracts/governance/IGovernor.sol";
+import {IGovernor} from "./IGovernor.sol";
 
 abstract contract IGovernorCompatibilityZK is IGovernor {
     enum VoteType {

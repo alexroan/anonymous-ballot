@@ -102,9 +102,8 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC165) returns (bool) {
         // In addition to the current interfaceId, also support previous version of the interfaceId that did not
         // include the castVoteWithReasonAndParams() function as standard
-        return interfaceId == (type(IGovernor).interfaceId ^ this.getVotesWithParams.selector)
-            || interfaceId == type(IGovernor).interfaceId || interfaceId == type(IERC1155Receiver).interfaceId
-            || super.supportsInterface(interfaceId);
+        return interfaceId == (type(IGovernor).interfaceId) || interfaceId == type(IGovernor).interfaceId
+            || interfaceId == type(IERC1155Receiver).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -214,30 +213,14 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
     /**
      * @dev Get the voting weight of `account` at a specific `blockNumber`, for a vote as described by `params`.
      */
-    function _getVotes(address account, uint256 blockNumber, bytes memory params)
-        internal
-        view
-        virtual
-        returns (uint256);
+    function _getVotes(address account, uint256 blockNumber) internal view virtual returns (uint256);
 
     /**
-     * @dev Register a vote for `proposalId` by `account` with a given `support`, voting `weight` and voting `params`.
+     * @dev Register a vote for `proposalId` by `nullifier` with a given `support`, voting `weight`.
      *
      * Note: Support is generic and can represent various things depending on the voting system used.
      */
-    function _countVote(uint256 proposalId, address account, uint8 support, uint256 weight, bytes memory params)
-        internal
-        virtual;
-
-    /**
-     * @dev Default additional encoded parameters used by castVote methods that don't include them
-     *
-     * Note: Should be overridden by specific implementations to use an appropriate value, the
-     * meaning of the additional params, in the context of that implementation
-     */
-    function _defaultParams() internal view virtual returns (bytes memory) {
-        return "";
-    }
+    function _countVote(uint256 proposalId, bytes32 nullifier, uint8 support, uint256 weight) internal virtual;
 
     /**
      * @dev See {IGovernor-propose}.
@@ -392,20 +375,7 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor, IERC721Receive
      * @dev See {IGovernor-getVotes}.
      */
     function getVotes(address account, uint256 blockNumber) public view virtual override returns (uint256) {
-        return _getVotes(account, blockNumber, _defaultParams());
-    }
-
-    /**
-     * @dev See {IGovernor-getVotesWithParams}.
-     */
-    function getVotesWithParams(address account, uint256 blockNumber, bytes memory params)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
-        return _getVotes(account, blockNumber, params);
+        return _getVotes(account, blockNumber);
     }
 
     /**

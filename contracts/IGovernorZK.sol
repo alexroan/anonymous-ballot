@@ -20,4 +20,14 @@ interface IGovernorZK {
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
     ) external;
+    function castVoteWithReason(
+        uint256 proposalId,
+        uint8 support,
+        string memory reason,
+        uint256 nullifier,
+        uint256 root,
+        uint256[2] calldata proof_a,
+        uint256[2][2] calldata proof_b,
+        uint256[2] calldata proof_c
+    ) external;
 }

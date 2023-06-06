@@ -66,25 +66,54 @@ contract GovernorZK is
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
     ) external override(IGovernorZK) {
+        castVoteWithReason(proposalId, support, "", nullifier, root, proof_a, proof_b, proof_c);
+    }
+
+    /// @dev castVote with ZK proofs
+    function castVoteWithReason(
+        uint256 proposalId,
+        uint8 support,
+        string memory reason,
+        uint256 nullifier,
+        uint256 root,
+        uint256[2] calldata proof_a,
+        uint256[2][2] calldata proof_b,
+        uint256[2] calldata proof_c
+    ) public override(IGovernorZK) {
+        _castVote(proposalId, support, reason, nullifier, root, proof_a, proof_b, proof_c);
+    }
+
+    function _castVote(
+        uint256 proposalId,
+        uint8 support,
+        string memory reason,
+        uint256 nullifier,
+        uint256 root,
+        uint256[2] calldata proof_a,
+        uint256[2][2] calldata proof_b,
+        uint256[2] calldata proof_c
+    ) internal {
         // Check that the state is active
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Active) revert WrongState(proposalState, ProposalState.Active);
 
         // nullify the commitment
-        _nullify(bytes32(nullifier), bytes32(root), proof_a, proof_b, proof_c);
+        bytes32 bNullifier = bytes32(nullifier);
+        _nullify(bNullifier, bytes32(root), proof_a, proof_b, proof_c);
+
+        uint256 votes = IVotesPerVoter(address(token)).votesPerVoter();
 
         _countVote(
             proposalId,
-            bytes32(nullifier),
+            bNullifier,
             support,
             // Currently this returns 1, as we assume that if your commitment is part of the merkle tree, then your voting power is 1.
             // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
             // TODO: Think more about this in future versions.
-            IVotesPerVoter(address(token)).votesPerVoter()
+            votes
         );
 
-        // TODO event
-        // emit VoteCast(nullifier, proposalId, support, 1);
+        emit VoteCast(bNullifier, proposalId, support, votes, reason);
     }
 
     /// BLOILERPLATE BELOW ///

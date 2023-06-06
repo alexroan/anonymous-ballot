@@ -10,6 +10,8 @@
 ///   * `castVoteBySig`
 ///   * `castVoteWithReasonAndParamsBySig`
 ///   * both `_castVote` functions
+///   * `_defaultParams`
+/// * Removal of params from voting
 
 pragma solidity ^0.8.0;
 

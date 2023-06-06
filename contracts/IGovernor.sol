@@ -9,6 +9,8 @@
 ///   * `castVoteWithReasonAndParams`
 ///   * `castVoteBySig`
 ///   * `castVoteWithReasonAndParamsBySig`
+///   * `getVotesWithParams`
+///   * event `VoteCastWithParams`
 
 pragma solidity ^0.8.0;
 

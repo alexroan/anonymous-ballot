@@ -106,12 +106,7 @@ contract GovernorZK is
         // TODO: Think more about this in future versions.
         uint256 votes = IVotesPerVoter(address(token)).votesPerVoter();
 
-        _countVote(
-            proposalId,
-            bNullifier,
-            support,
-            votes
-        );
+        _countVote(proposalId, bNullifier, support, votes);
 
         emit VoteCast(bNullifier, proposalId, support, votes, reason);
     }

@@ -19,8 +19,6 @@ contract GovernorZK is
     GovernorCompatibilityZK,
     ZKTree
 {
-    mapping(uint256 proposalId => mapping(address voter => bool commited)) public s_hasCommitted;
-
     constructor(
         IVotes _token,
         TimelockController _timelock,
@@ -44,7 +42,7 @@ contract GovernorZK is
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Pending) revert WrongState(proposalState, ProposalState.Pending);
         // check if the msg.sender has already committed for this vote
-        if (s_hasCommitted[proposalId][msg.sender]) revert AlreadyCommitted(proposalId, msg.sender);
+        if (hasCommitted(proposalId, msg.sender)) revert AlreadyCommitted(proposalId, msg.sender);
         // check that the msg.sender is eligible to commit for this vote
         uint256 weight = getVotes(msg.sender, proposalSnapshot(proposalId));
         if (weight == 0) revert NotEligible(msg.sender);
@@ -53,7 +51,7 @@ contract GovernorZK is
 
         // commit
         _commit(bytes32(commitment));
-        s_hasCommitted[proposalId][msg.sender] = true;
+        _registerCommitment(proposalId, msg.sender);
     }
 
     /// @dev castVote with ZK proofs

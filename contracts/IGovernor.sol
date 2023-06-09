@@ -169,10 +169,10 @@ abstract contract IGovernor is IERC165 {
     function getVotes(address account, uint256 blockNumber) public view virtual returns (uint256);
 
     /**
-     * @notice module:voting
-     * @dev Returns whether `account` has cast a vote on `proposalId`.
+     * @notice module:committing
+     * @dev Returns whether `account` has committed to vote on `proposalId`.
      */
-    function hasVoted(uint256 proposalId, address account) public view virtual returns (bool);
+    function hasCommitted(uint256 proposalId, address account) public view virtual returns (bool);
 
     /**
      * @dev Create a new proposal. Vote start {IGovernor-votingDelay} blocks after the proposal is created and ends

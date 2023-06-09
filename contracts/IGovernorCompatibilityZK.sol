@@ -20,6 +20,7 @@ abstract contract IGovernorCompatibilityZK is IGovernor {
         uint256 forVotes;
         uint256 againstVotes;
         uint256 abstainVotes;
+        mapping(address voter => bool) hasCommitted;
         mapping(bytes32 nullifier => Receipt) receipts;
         bytes32 descriptionHash;
     }

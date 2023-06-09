@@ -262,35 +262,4 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
             details.abstainVotes += weight;
         }
     }
-
-    /**
-     * @dev See {Governor-_countVote}. In this module, the support follows Governor Bravo.
-     */
-    function _countVote(
-        uint256,
-        address,
-        uint8,
-        uint256,
-        bytes memory // params
-    ) internal virtual override {
-        // ProposalDetails storage details = _proposalDetails[proposalId];
-        // Receipt storage receipt = details.receipts[account];
-
-        // require(!receipt.hasVoted, "GovernorCompatibilityBravo: vote already cast");
-        // receipt.hasVoted = true;
-        // receipt.support = support;
-        // receipt.votes = SafeCast.toUint96(weight);
-
-        // if (support == uint8(VoteType.Against)) {
-        //     details.againstVotes += weight;
-        // } else if (support == uint8(VoteType.For)) {
-        //     details.forVotes += weight;
-        // } else if (support == uint8(VoteType.Abstain)) {
-        //     details.abstainVotes += weight;
-        // } else {
-        //     revert("GovernorCompatibilityBravo: invalid vote type");
-        // }
-        // TODO: Figure better way of doing this.
-        revert();
-    }
 }

@@ -50,13 +50,6 @@ contract GovernorCompatibilityZKTest is BaseTest {
         assertProposalActions(proposalId, targets, values, signatures, calldatas);
     }
 
-    // overridden _countVote
-
-    function test__countVoteOverridden() public {
-        vm.expectRevert();
-        s_compat.countVoteInternal(0, USER_0, 0, 0, "");
-    }
-
     // new _countVote
 
     function test__countVoteZK_For() public {

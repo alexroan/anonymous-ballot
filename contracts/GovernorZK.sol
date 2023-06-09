@@ -66,7 +66,7 @@ contract GovernorZK is
         uint256[2][2] calldata proof_b,
         uint256[2] calldata proof_c
     ) external override(IGovernorZK) {
-        castVoteWithReason(proposalId, support, "", nullifier, root, proof_a, proof_b, proof_c);
+        _castVote(proposalId, support, "", nullifier, root, proof_a, proof_b, proof_c);
     }
 
     /// @dev castVote with ZK proofs
@@ -101,17 +101,12 @@ contract GovernorZK is
         bytes32 bNullifier = bytes32(nullifier);
         _nullify(bNullifier, bytes32(root), proof_a, proof_b, proof_c);
 
+        // Currently this returns 1, as we assume that if your commitment is part of the merkle tree, then your voting power is 1.
+        // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
+        // TODO: Think more about this in future versions.
         uint256 votes = IVotesPerVoter(address(token)).votesPerVoter();
 
-        _countVote(
-            proposalId,
-            bNullifier,
-            support,
-            // Currently this returns 1, as we assume that if your commitment is part of the merkle tree, then your voting power is 1.
-            // Potentially have tranches of merkle trees (1, 10, 100, etc) to allow for more voting power.
-            // TODO: Think more about this in future versions.
-            votes
-        );
+        _countVote(proposalId, bNullifier, support, votes);
 
         emit VoteCast(bNullifier, proposalId, support, votes, reason);
     }

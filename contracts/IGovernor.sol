@@ -9,6 +9,8 @@
 ///   * `castVoteWithReasonAndParams`
 ///   * `castVoteBySig`
 ///   * `castVoteWithReasonAndParamsBySig`
+///   * `getVotesWithParams`
+///   * event `VoteCastWithParams`
 
 pragma solidity ^0.8.0;
 
@@ -62,16 +64,6 @@ abstract contract IGovernor is IERC165 {
      * Note: `support` values should be seen as buckets. Their interpretation depends on the voting module used.
      */
     event VoteCast(bytes32 indexed nullifier, uint256 proposalId, uint8 support, uint256 weight, string reason);
-
-    /**
-     * @dev Emitted when a vote is cast with params.
-     *
-     * Note: `support` values should be seen as buckets. Their interpretation depends on the voting module used.
-     * `params` are additional encoded parameters. Their intepepretation also depends on the voting module used.
-     */
-    event VoteCastWithParams(
-        bytes32 indexed nullifier, uint256 proposalId, uint8 support, uint256 weight, string reason, bytes params
-    );
 
     /**
      * @notice module:core
@@ -175,16 +167,6 @@ abstract contract IGovernor is IERC165 {
      * multiple), {ERC20Votes} tokens.
      */
     function getVotes(address account, uint256 blockNumber) public view virtual returns (uint256);
-
-    /**
-     * @notice module:reputation
-     * @dev Voting power of an `account` at a specific `blockNumber` given additional encoded parameters.
-     */
-    function getVotesWithParams(address account, uint256 blockNumber, bytes memory params)
-        public
-        view
-        virtual
-        returns (uint256);
 
     /**
      * @notice module:voting

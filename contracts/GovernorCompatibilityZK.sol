@@ -202,6 +202,13 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
     }
 
     /**
+     * @dev See {IGovernor-hasCommitted}.
+     */
+    function hasCommitted(uint256 proposalId, address account) public view virtual override returns (bool) {
+        return _proposalDetails[proposalId].hasCommitted[account];
+    }
+
+    /**
      * @dev See {IGovernorCompatibilityZK-getReceipt}.
      */
     function getReceipt(uint256 proposalId, bytes32 nullifier) public view virtual override returns (Receipt memory) {
@@ -215,15 +222,13 @@ abstract contract GovernorCompatibilityZK is IGovernorTimelock, IGovernorCompati
         return quorum(block.number - 1);
     }
 
-    // ==================================================== Voting ====================================================
-    /**
-     * @dev See {IGovernor-hasVoted}.
-     */
-    function hasVoted(uint256, address) public view virtual override returns (bool) {
-        // return _proposalDetails[proposalId].receipts[account].hasVoted;
-        // TODO: Figure better way of doing this.
-        revert();
+    // ==================================================== Committing ====================================================
+
+    function _registerCommitment(uint256 proposalId, address account) internal {
+        _proposalDetails[proposalId].hasCommitted[account] = true;
     }
+
+    // ==================================================== Voting ====================================================
 
     /**
      * @dev See {Governor-_quorumReached}. In this module, only forVotes count toward the quorum.

@@ -9,6 +9,7 @@ remappings = [
     "@openzeppelin/=node_modules/@openzeppelin/",
 ]
 block_number = 12345678
+block_timestamp = 12345678
 via_ir = true
 
 [fmt]

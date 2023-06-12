@@ -9,11 +9,17 @@ contract GovernorCompatibilityZKMock is GovernorCompatibilityZK {
 
     function _getVotes(address account, uint256 blockNumber) internal view override returns (uint256) {}
     function proposalEta(uint256 proposalId) public view override returns (uint256) {}
+
+    event QueueCalled(address[] targets, uint256[] values, bytes[] calldatas, bytes32 descriptionHash);
+
     function queue(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
         public
         override
         returns (uint256)
-    {}
+    {
+        emit QueueCalled(targets, values, calldatas, descriptionHash);
+    }
+
     function quorum(uint256 blockNumber) public view override returns (uint256) {}
     function timelock() public view override returns (address) {}
     function votingDelay() public view override returns (uint256) {}

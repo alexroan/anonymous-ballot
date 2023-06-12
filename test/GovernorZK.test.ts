@@ -79,4 +79,5 @@ describe("GovernorZK", () =>  {
         // Assert that it succeeds
         assert(await governor.state(proposalId) == 4)
     });
+
 });

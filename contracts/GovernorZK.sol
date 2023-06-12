@@ -38,6 +38,8 @@ contract GovernorZK is
     /// should reach out to _getVotes to get the voter's voting power,
     /// should store commitment in the merkle tree
     function registerCommitment(uint256 proposalId, uint256 commitment) external override(IGovernorZK) {
+        // check that the commitment is valid
+        if (commitment == 0) revert InvalidCommitment(commitment);
         // check the state is pending
         ProposalState proposalState = state(proposalId);
         if (proposalState != ProposalState.Pending) revert WrongState(proposalState, ProposalState.Pending);
@@ -46,8 +48,6 @@ contract GovernorZK is
         // check that the msg.sender is eligible to commit for this vote
         uint256 weight = getVotes(msg.sender, proposalSnapshot(proposalId));
         if (weight == 0) revert NotEligible(msg.sender);
-        // check that the commitment is valid
-        if (commitment == 0) revert InvalidCommitment(commitment);
 
         // commit
         _commit(bytes32(commitment));
